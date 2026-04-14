@@ -1,0 +1,61 @@
+{% extends "student/base_student.html" %}
+{% block title %}Fees – GDC{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:20px;color:#333;">💰 Fee Details</h2>
+
+{% if fees %}
+<div class="card">
+  <h3 style="margin-bottom:16px;">Fee Structure – {{ student.branch.upper() }} Year {{ student.year }}</h3>
+  <table>
+    <thead>
+      <tr><th>Description</th><th>Amount</th><th>Due Date</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      {% set total_pending = namespace(amt=0) %}
+      {% for f in fees %}
+      {% set is_paid = f.id in paid_ids %}
+      {% if not is_paid %}{% set total_pending.amt = total_pending.amt + f.amount %}{% endif %}
+      <tr>
+        <td>{{ f.description or 'Fee' }}</td>
+        <td><strong>₹{{ "{:,.0f}".format(f.amount) }}</strong></td>
+        <td>{{ f.due_date or 'On Demand' }}</td>
+        <td>
+          {% if is_paid %}
+          <span class="badge badge-green">✓ Paid</span>
+          {% else %}
+          <span class="badge badge-red">⏳ Pending</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if total_pending.amt > 0 %}
+  <div style="margin-top:16px;padding:14px;background:#fef2f2;border-radius:8px;
+              border-left:4px solid #dc3545;">
+    <strong style="color:#b91c1c;">⚠️ Total Pending Amount: ₹{{ "{:,.0f}".format(total_pending.amt) }}</strong><br>
+    <small style="color:#666;">Please pay at the college accounts section or contact admin.</small>
+  </div>
+  {% else %}
+  <div style="margin-top:16px;padding:14px;background:#d4edda;border-radius:8px;
+              border-left:4px solid #28a745;">
+    <strong style="color:#155724;">✓ All fees are paid. You're good!</strong>
+  </div>
+  {% endif %}
+</div>
+
+<div class="card" style="background:#fffbea;border-left:4px solid #ffc107;">
+  <strong>💡 Note:</strong> For fee receipts, payment updates, or any discrepancy — contact the college accounts section or visit the admin office.
+</div>
+
+{% else %}
+<div class="card">
+  <p style="color:#999;text-align:center;padding:30px;">
+    No fee records found for your branch/year. Contact admin.
+  </p>
+</div>
+{% endif %}
+
+{% endblock %}

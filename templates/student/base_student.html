@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block body %}
+
+<!-- Student Navbar -->
+<nav class="nav-header">
+  <span class="brand">🎓 GDC Student Portal</span>
+  <div class="nav-actions">
+    <a href="/student/dashboard">Home</a>
+    <a href="/student/profile">👤 {{ session.name }}</a>
+    <a href="/logout" class="btn-logout">Logout ⏻</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="/student/dashboard" {% if request.path=='/student/dashboard' %}class="active"{% endif %}>🏠 Dashboard</a>
+    <a href="/student/profile" {% if '/student/profile' in request.path %}class="active"{% endif %}>👤 My Profile</a>
+    <a href="/student/notifications" {% if '/student/notifications' in request.path %}class="active"{% endif %}>🔔 Notifications</a>
+    <a href="/student/results" {% if '/student/results' in request.path %}class="active"{% endif %}>📊 My Results</a>
+    <a href="/student/attendance" {% if '/student/attendance' in request.path %}class="active"{% endif %}>✅ Attendance</a>
+    <a href="/student/timetable" {% if '/student/timetable' in request.path %}class="active"{% endif %}>🗓️ Timetable</a>
+    <a href="/student/fees" {% if '/student/fees' in request.path %}class="active"{% endif %}>💰 Fees</a>
+    <a href="/student/placements" {% if '/student/placements' in request.path %}class="active"{% endif %}>💼 Placements</a>
+    <a href="/student/projects" {% if '/student/projects' in request.path %}class="active"{% endif %}>🔧 Projects</a>
+    <a href="/student/courses" {% if '/student/courses' in request.path %}class="active"{% endif %}>📚 Courses</a>
+    <a href="/student/ranks" {% if '/student/ranks' in request.path %}class="active"{% endif %}>🏆 My Ranks</a>
+    <a href="/student/associations" {% if '/student/associations' in request.path %}class="active"{% endif %}>🤝 Associations</a>
+  <a href="/student/chatbot" {% if '/student/chatbot' in request.path %}class="active"{% endif %}>🤖 Chatbot</a>
+  </div>
+
+  <!-- Page Content -->
+  <div class="content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+
+
+{% endblock %}

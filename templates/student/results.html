@@ -1,0 +1,60 @@
+{% extends "student/base_student.html" %}
+{% block title %}My Results – GDC{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:20px;color:#333;">📊 My Results</h2>
+
+{% if semesters %}
+  {% for sem, results in semesters.items() %}
+  <div class="card">
+    <h3 style="margin-bottom:16px;">Semester {{ sem }}</h3>
+    <table>
+      <thead>
+        <tr><th>Subject</th><th>Marks</th><th>Max Marks</th><th>Percentage</th><th>Grade</th></tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        {% set pct = (r.marks / r.max_marks * 100)|round(1) %}
+        <tr>
+          <td>{{ r.subject }}</td>
+          <td><strong>{{ r.marks }}</strong></td>
+          <td>{{ r.max_marks }}</td>
+          <td>
+            <span style="color:{% if pct >= 75 %}#155724{% elif pct >= 50 %}#856404{% else %}#721c24{% endif %};">
+              {{ pct }}%
+            </span>
+          </td>
+          <td>
+            {% if r.grade %}
+            <span class="badge
+              {% if r.grade in ['O','A+'] %}badge-green
+              {% elif r.grade in ['A','B+','B'] %}badge-blue
+              {% else %}badge-orange{% endif %}">
+              {{ r.grade }}
+            </span>
+            {% else %}-{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <!-- Semester summary -->
+    {% set total = results|sum(attribute='marks') %}
+    {% set max_total = results|sum(attribute='max_marks') %}
+    {% if max_total > 0 %}
+    <div style="text-align:right;margin-top:12px;font-size:14px;color:#555;">
+      <strong>Total: {{ total }} / {{ max_total }} 
+      ({{ (total/max_total*100)|round(1) }}%)</strong>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="card">
+    <p style="color:#999;text-align:center;padding:30px;">
+      No results published yet. Check back after exams! 📚
+    </p>
+  </div>
+{% endif %}
+
+{% endblock %}

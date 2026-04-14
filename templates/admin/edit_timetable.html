@@ -1,0 +1,78 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Edit Timetable{% endblock %}
+{% block content %}
+<div class="card-header"><h2 class="card-title">✏️ Edit Timetable Entry</h2></div>
+<div class="card">
+  <form action="{{ url_for('admin.admin_edit_timetable', tid=t.id) }}" method="POST">
+
+    <!-- Combine start+end into time_slot on submit -->
+    <input type="hidden" name="time_slot" id="time_slot_hidden">
+
+    <div style="display:flex;gap:15px;flex-wrap:wrap;">
+      <div class="form-group"><label>Branch</label>
+        <select name="branch" class="form-control" required>
+          <option value="bca" {% if t.branch=='bca' %}selected{% endif %}>BCA</option>
+          <option value="bcom" {% if t.branch=='bcom' %}selected{% endif %}>BCOM</option>
+          <option value="bba" {% if t.branch=='bba' %}selected{% endif %}>BBA</option>
+          <option value="puc" {% if t.branch=='puc' %}selected{% endif %}>PUC</option>
+          <option value="mba" {% if t.branch=='mba' %}selected{% endif %}>MBA</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Year</label>
+        <input type="number" name="year" class="form-control" value="{{ t.year }}" min="1" max="5" required>
+      </div>
+      <div class="form-group"><label>Day</label>
+        <select name="day" class="form-control" required>
+          {% for day in ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] %}
+          <option {% if t.day==day %}selected{% endif %}>{{ day }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {% set times = ['08:00 AM','08:30 AM','09:00 AM','09:30 AM','10:00 AM','10:30 AM',
+                      '11:00 AM','11:30 AM','12:00 PM','12:30 PM','01:00 PM','01:30 PM',
+                      '02:00 PM','02:30 PM','03:00 PM','03:30 PM','04:00 PM','04:30 PM','05:00 PM'] %}
+
+      {% set slot_parts = t.time_slot.split(' - ') if t.time_slot else ['09:00 AM', '10:00 AM'] %}
+
+      <div class="form-group"><label>Start Time</label>
+        <select name="start_time" id="start_time" class="form-control" required>
+          {% for time in times %}
+          <option value="{{ time }}" {% if slot_parts[0].strip()==time %}selected{% endif %}>{{ time }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group"><label>End Time</label>
+        <select name="end_time" id="end_time" class="form-control" required>
+          {% for time in times %}
+          <option value="{{ time }}" {% if slot_parts|length>1 and slot_parts[1].strip()==time %}selected{% endif %}>{{ time }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group"><label>Subject</label>
+        <input type="text" name="subject" class="form-control" value="{{ t.subject }}" required>
+      </div>
+      <div class="form-group"><label>Teacher</label>
+        <input type="text" name="teacher" class="form-control" value="{{ t.teacher or '' }}">
+      </div>
+      <div class="form-group"><label>Room</label>
+        <input type="text" name="room" class="form-control" value="{{ t.room or '' }}">
+      </div>
+
+      <div class="form-group" style="width:100%;display:flex;gap:10px;">
+        <button type="submit" class="btn btn-primary" onclick="combineTime(event)">💾 Save Changes</button>
+        <a href="{{ url_for('admin.admin_timetable') }}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+function combineTime(e) {
+    var start = document.getElementById('start_time').value;
+    var end = document.getElementById('end_time').value;
+    document.getElementById('time_slot_hidden').value = start + ' - ' + end;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "student/base_student.html" %}
+{% block title %}Dashboard – GDC Student Portal{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:20px;color:#333;">Welcome, {{ student.name }} 👋</h2>
+
+<!-- Quick stats -->
+<div class="stats">
+  <div class="stat-card">
+    <div class="number" style="color:#1e3a8a;">{{ student.branch.upper() if student.branch else '-' }}</div>
+    <div class="label">Branch</div>
+  </div>
+  <div class="stat-card">
+    <div class="number" style="color:#1e3a8a;">Year {{ student.year or '-' }}</div>
+    <div class="label">Current Year</div>
+  </div>
+  <div class="stat-card">
+    <div class="number" style="color:#1e3a8a;">{{ student.reg_number }}</div>
+    <div class="label">Reg. Number</div>
+  </div>
+</div>
+
+<!-- Notifications -->
+<div class="card">
+  <h2>🔔 Active Notifications</h2>
+  {% if notifications %}
+    {% for n in notifications %}
+    <div style="border-left:4px solid #1e3a8a;padding:12px 16px;margin-bottom:12px;
+                background:#eff6ff;border-radius:0 8px 8px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong style="font-size:15px;color:#1e3a8a;">{{ n.title }}</strong>
+        <div style="display:flex;gap:6px;">
+          {% if n.target_branch != 'all' %}
+          <span class="badge badge-blue">{{ n.target_branch.upper() }}</span>
+          {% endif %}
+          {% if n.expires_at %}
+          <span class="badge badge-orange" style="font-size:11px;">
+            ⏰ Expires {{ n.expires_at.strftime('%d %b, %I:%M %p') }}
+          </span>
+          {% endif %}
+        </div>
+      </div>
+      <p style="margin-top:6px;font-size:14px;color:#333;">{{ n.message }}</p>
+      <small style="color:#888;">Posted {{ n.created_at.strftime('%d %b %Y') }}</small>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:#999;text-align:center;padding:20px;">No notifications at this time.</p>
+  {% endif %}
+</div>
+
+<!-- Quick links -->
+<div class="card">
+  <h2>Quick Access</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;">
+    <a href="/student/results" class="btn btn-blue">📊 My Results</a>
+    <a href="/student/attendance" class="btn btn-blue">✅ Attendance</a>
+    <a href="/student/timetable" class="btn btn-blue">🗓️ Timetable</a>
+    <a href="/student/fees" class="btn btn-blue">💰 Fees</a>
+    <a href="/student/placements" class="btn btn-blue">💼 Placements</a>
+    <a href="/student/projects" class="btn btn-blue">🔧 Projects</a>
+  </div>
+</div>
+
+{% endblock %}

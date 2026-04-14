@@ -1,0 +1,34 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Manage Courses{% endblock %}
+{% block content %}
+<div class="card-header"><h2 class="card-title">Manage Courses</h2></div>
+<div class="card">
+  <form action="{{ url_for('admin.admin_courses') }}" method="POST">
+    <div style="display:flex;gap:15px;flex-wrap:wrap;">
+      <div class="form-group"><label>Branch</label>
+        <select name="branch" class="form-control" required>
+          <option value="bca">BCA</option><option value="bcom">BCOM</option><option value="bba">BBA</option><option value="puc">PUC</option><option value="mba">MBA</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Year</label><input type="number" name="year" class="form-control" required></div>
+      <div class="form-group"><label>Name</label><input type="text" name="name" class="form-control" required></div>
+      <div class="form-group"><label>Code</label><input type="text" name="code" class="form-control"></div>
+      <div class="form-group"><label>Credits</label><input type="number" name="credits" class="form-control"></div>
+      <div class="form-group" style="width:100%;"><label>Description</label><input type="text" name="description" class="form-control"></div>
+      <div class="form-group"><button type="submit" class="btn btn-primary">Add Course</button></div>
+    </div>
+  </form>
+</div>
+<div class="card">
+  <table>
+    <tr><th>Branch & Year</th><th>Course Name</th><th>Code</th><th>Credits</th><th>Action</th></tr>
+    {% for c in courses %}
+    <tr>
+      <td><span class="badge badge-blue">{{ c.branch | upper }}</span> Yr {{ c.year }}</td>
+      <td>{{ c.name }}</td><td>{{ c.code }}</td><td>{{ c.credits }}</td>
+      <td><form action="{{ url_for('admin.admin_delete_course', cid=c.id) }}" method="POST"><button type="submit" class="btn btn-danger btn-sm">Delete</button></form></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

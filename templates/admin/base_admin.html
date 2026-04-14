@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block body %}
+
+<!-- Admin Navbar -->
+<nav class="nav-header" style="background: linear-gradient(135deg, #111827, #374151);">
+  <span class="brand">👨‍💼 GDC Admin Console</span>
+  <div class="nav-actions">
+    <a href="/admin/dashboard">Home</a>
+    <span>{{ session.name }} (Admin)</span>
+    <a href="/logout" class="btn-logout" style="background: #ef4444;">Logout ⏻</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="/admin/dashboard" {% if request.path=='/admin/dashboard' %}class="active"{% endif %}>🎛️ Dashboard</a>
+    <a href="/admin/students" {% if '/admin/students' in request.path %}class="active"{% endif %}>👥 Students</a>
+    <a href="/admin/notifications" {% if '/admin/notifications' in request.path %}class="active"{% endif %}>📢 Notifications</a>
+    <a href="/admin/fees" {% if '/admin/fees' in request.path %}class="active"{% endif %}>💰 Fees</a>
+    <a href="/admin/courses" {% if '/admin/courses' in request.path %}class="active"{% endif %}>📚 Courses</a>
+    <a href="/admin/placements" {% if '/admin/placements' in request.path %}class="active"{% endif %}>💼 Placements</a>
+    <a href="/admin/results" {% if '/admin/results' in request.path %}class="active"{% endif %}>📊 Results</a>
+    <a href="/admin/attendance" {% if '/admin/attendance' in request.path %}class="active"{% endif %}>✅ Attendance</a>
+    <a href="/admin/timetable" {% if '/admin/timetable' in request.path %}class="active"{% endif %}>🗓️ Timetable</a>
+    <a href="/admin/projects" {% if '/admin/projects' in request.path %}class="active"{% endif %}>🔧 Projects</a>
+    <a href="/admin/ranks" {% if '/admin/ranks' in request.path %}class="active"{% endif %}>🏆 Ranks</a>
+    <a href="/admin/associations" {% if '/admin/associations' in request.path %}class="active"{% endif %}>🤝 Associations</a>
+  </div>
+
+  <!-- Page Content -->
+  <div class="content">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+{% endblock %}

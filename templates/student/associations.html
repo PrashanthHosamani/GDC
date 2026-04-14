@@ -1,0 +1,26 @@
+{% extends "student/base_student.html" %}
+{% block title %}Associations & Clubs{% endblock %}
+{% block content %}
+<div class="card-header"><h2 class="card-title">🤝 Associations & Clubs</h2></div>
+
+{% if associations %}
+<div class="card">
+  <table>
+    <tr><th>Name</th><th>Category</th><th>Event Date</th><th>Description</th><th>Contact</th></tr>
+    {% for a in associations %}
+    <tr>
+      <td><strong>{{ a.name }}</strong></td>
+      <td><span class="badge badge-blue">{{ a.category or 'General' }}</span></td>
+      <td>{{ a.event_date or 'Ongoing' }}</td>
+      <td>{{ a.description or '-' }}</td>
+      <td>{{ a.contact or '-' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% else %}
+<div class="card">
+  <p style="text-align:center;color:#888;padding:30px;">No associations or clubs listed yet. Check back later!</p>
+</div>
+{% endif %}
+{% endblock %}

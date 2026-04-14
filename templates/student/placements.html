@@ -1,0 +1,64 @@
+{% extends "student/base_student.html" %}
+{% block title %}Placements – GDC{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:20px;color:#333;">💼 Placement Drives</h2>
+
+<!-- Eligible -->
+<div class="card">
+  <h3 style="color:#155724;margin-bottom:16px;">✅ You Are Eligible For ({{ eligible|length }})</h3>
+  {% if eligible %}
+    {% for p in eligible %}
+    <div style="border:1px solid #c3e6cb;border-radius:10px;padding:16px;margin-bottom:12px;background:#f0fff4;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+        <div>
+          <strong style="font-size:16px;color:#155724;">{{ p.company_name }}</strong>
+          <span style="margin-left:10px;font-size:13px;color:#555;">{{ p.job_role }}</span>
+        </div>
+        <span class="badge {% if p.status == 'upcoming' %}badge-blue{% else %}badge-green{% endif %}">
+          {{ p.status.title() }}
+        </span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:13px;color:#555;">
+        {% if p.salary_min or p.salary_max %}
+        <span>💰 ₹{{ p.salary_min }}–{{ p.salary_max }} LPA</span>
+        {% endif %}
+        {% if p.drive_date %}
+        <span>📅 {{ p.drive_date }}</span>
+        {% endif %}
+        <span>📊 Min {{ p.min_percentage }}%</span>
+        <span>🎓 {{ p.eligible_branches }}</span>
+      </div>
+      {% if p.description %}
+      <p style="margin-top:10px;font-size:13px;color:#333;line-height:1.5;">{{ p.description }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:#999;text-align:center;padding:20px;">No eligible drives at the moment. Check back soon!</p>
+  {% endif %}
+</div>
+
+<!-- Not eligible -->
+{% if not_eligible %}
+<div class="card">
+  <h3 style="color:#856404;margin-bottom:16px;">ℹ️ Other Active Drives ({{ not_eligible|length }})</h3>
+  {% for p in not_eligible %}
+  <div style="border:1px solid #e0e0e0;border-radius:10px;padding:14px;margin-bottom:10px;
+              background:#fafafa;opacity:0.75;">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
+        <strong style="color:#555;">{{ p.company_name }}</strong>
+        <span style="margin-left:10px;font-size:13px;color:#888;">{{ p.job_role }}</span>
+      </div>
+      <span class="badge badge-red">Not Eligible</span>
+    </div>
+    <div style="font-size:12px;color:#999;margin-top:6px;">
+      For: {{ p.eligible_branches }} | Min: {{ p.min_percentage }}%
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

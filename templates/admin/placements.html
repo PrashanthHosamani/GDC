@@ -1,0 +1,47 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Manage Placements{% endblock %}
+{% block content %}
+<div class="card-header"><h2 class="card-title">Placement Drives</h2></div>
+<div class="card">
+  <form action="{{ url_for('admin.admin_placements') }}" method="POST">
+    <div style="display:flex;gap:15px;flex-wrap:wrap;">
+      <div class="form-group"><label>Company Name</label><input type="text" name="company_name" class="form-control" required></div>
+      <div class="form-group"><label>Job Role</label><input type="text" name="job_role" class="form-control" required></div>
+      <div class="form-group"><label>Min Salary (LPA)</label><input type="number" step="0.01" name="salary_min" class="form-control"></div>
+      <div class="form-group"><label>Max Salary (LPA)</label><input type="number" step="0.01" name="salary_max" class="form-control"></div>
+      <div class="form-group"><label>Drive Date</label><input type="date" name="drive_date" class="form-control"></div>
+      <div class="form-group"><label>Min Percentage %</label><input type="number" step="0.1" name="min_percentage" class="form-control" value="60"></div>
+      <div class="form-group"><label>Status</label>
+        <select name="status" class="form-control">
+          <option value="upcoming">Upcoming</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div class="form-group" style="width:100%;">
+          <label>Eligible Branches (Ctrl+Click to select multiple)</label>
+          <select name="branches" class="form-control" multiple style="height:100px;">
+              <option value="bca">BCA</option><option value="bcom">BCOM</option><option value="bba">BBA</option><option value="mba">MBA</option><option value="puc">PUC</option>
+          </select>
+      </div>
+      <div class="form-group" style="width:100%;"><label>Description</label><input type="text" name="description" class="form-control"></div>
+      <div class="form-group"><button type="submit" class="btn btn-primary">Add Placement</button></div>
+    </div>
+  </form>
+</div>
+<div class="card">
+  <table>
+    <tr><th>Company</th><th>Role</th><th>Salary (LPA)</th><th>Date</th><th>Status</th><th>Eligible</th><th>Action</th></tr>
+    {% for p in placements %}
+    <tr>
+      <td><strong>{{ p.company_name }}</strong></td>
+      <td>{{ p.job_role }}</td>
+      <td>{{ p.salary_min }} - {{ p.salary_max }}</td>
+      <td>{{ p.drive_date }}</td>
+      <td><span class="badge {% if p.status=='upcoming' %}badge-orange{% else %}badge-green{% endif %}">{{ p.status }}</span></td>
+      <td>{{ p.eligible_branches | upper }}</td>
+      <td><form action="{{ url_for('admin.admin_delete_placement', pid=p.id) }}" method="POST"><button type="submit" class="btn btn-danger btn-sm">Delete</button></form></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

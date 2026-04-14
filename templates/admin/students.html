@@ -1,0 +1,74 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Students – GDC Admin{% endblock %}
+{% block content %}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <h2 style="color:#333;">👥 Student Management</h2>
+  <div style="display:flex;gap:10px;">
+    <a href="/admin/students/add" class="btn btn-primary">+ Add Student</a>
+    <a href="/admin/students/bulk" class="btn btn-blue">📋 Bulk Import</a>
+  </div>
+</div>
+
+<!-- Filter by branch -->
+<div class="card" style="padding:14px 20px;">
+  <form method="GET" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    <label style="font-size:14px;font-weight:600;color:#555;">Filter by Branch:</label>
+    {% for b in ['','bca','bcom','bba','puc','mba'] %}
+    <button type="submit" name="branch" value="{{ b }}"
+            class="btn {% if selected_branch == b %}btn-primary{% endif %}"
+            style="background:{% if selected_branch==b %}#632902{% else %}#f0f0f0{% endif %};
+                   color:{% if selected_branch==b %}white{% else %}#555{% endif %};padding:6px 14px;">
+      {{ b.upper() if b else 'All' }}
+    </button>
+    {% endfor %}
+  </form>
+</div>
+
+<div class="card">
+  {% if students %}
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Reg. Number</th>
+        <th>Name</th>
+        <th>Branch</th>
+        <th>Year</th>
+        <th>Email</th>
+        <th>Account</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><strong>{{ s.reg_number }}</strong></td>
+        <td>{{ s.name }}</td>
+        <td><span class="badge badge-blue">{{ s.branch.upper() if s.branch else '-' }}</span></td>
+        <td>Year {{ s.year }}</td>
+        <td>{{ s.email or '-' }}</td>
+        <td>
+          {% if s.account_created %}
+            <span class="badge badge-green">✓ Active</span>
+          {% else %}
+            <span class="badge badge-orange">Pending</span>
+          {% endif %}
+        </td>
+        <td>
+          <form method="POST" action="/admin/students/delete/{{ s.id }}"
+                onsubmit="return confirm('Delete {{ s.name }}?');" style="display:inline;">
+            <button class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:#999;text-align:center;padding:30px;">No students found. <a href="/admin/students/add">Add one →</a></p>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "student/base_student.html" %}
+{% block title %}Chatbot – GDC{% endblock %}
+{% block content %}
+<div class="card-header"><h2 class="card-title">🤖 GDC Buddy</h2></div>
+<div class="card" style="max-width:600px;margin: 0 auto;display:flex;flex-direction:column;height:600px;">
+  
+  <div style="flex:1;overflow-y:auto;background:#f9fafb;padding:20px;border-radius:8px;border:1px solid #e5e7eb;margin-bottom:15px;">
+    <div style="background:var(--primary);color:white;padding:10px 15px;border-radius:10px;display:inline-block;max-width:80%;margin-bottom:15px;font-size:14px;">
+      Hello {{ session.name }}! I am GDC Buddy. Ask me about admissions, fees, courses, placements, or type "help".
+    </div>
+    
+    {% if query %}
+    <div style="text-align:right;margin-bottom:15px;">
+        <div style="background:#e5e7eb;color:#333;padding:10px 15px;border-radius:10px;display:inline-block;max-width:80%;font-size:14px;text-align:left;">
+          {{ query }}
+        </div>
+    </div>
+    <div style="background:var(--primary);color:white;padding:10px 15px;border-radius:10px;display:inline-block;max-width:80%;margin-bottom:15px;font-size:14px;">
+      {{ reply }}
+    </div>
+    {% endif %}
+  </div>
+
+  <form method="POST" action="/student/chatbot" style="display:flex;gap:10px;">
+    <input type="text" name="message" class="form-control" placeholder="Ask something..." required autofocus>
+    <button type="submit" class="btn btn-primary">Send</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Manage Notifications{% endblock %}
+{% block content %}
+<div class="card-header"><h2 class="card-title">Notifications</h2></div>
+<div class="card">
+  <form action="{{ url_for('admin.admin_notifications') }}" method="POST">
+    <div style="display:flex;gap:15px;flex-wrap:wrap;">
+      <div class="form-group" style="width:100%;"><label>Title</label><input type="text" name="title" class="form-control" required></div>
+      <div class="form-group" style="width:100%;"><label>Message</label><textarea name="message" class="form-control" rows="3" required></textarea></div>
+      <div class="form-group"><label>Target Branch</label>
+        <select name="branch" class="form-control">
+          <option value="all">All Branches</option>
+          <option value="bca">BCA</option><option value="bcom">BCOM</option><option value="bba">BBA</option><option value="puc">PUC</option><option value="mba">MBA</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Expires After (Hours) - Leave blank for no expiry</label><input type="number" name="hours" class="form-control"></div>
+      <div class="form-group" style="width:100%;"><button type="submit" class="btn btn-primary">Post Notification</button></div>
+    </div>
+  </form>
+</div>
+<div class="card">
+  <table>
+    <tr><th>Title</th><th>Target</th><th>Expires At</th><th>Status</th><th>Action</th></tr>
+    {% for n in notifications %}
+    <tr>
+      <td><strong>{{ n.title }}</strong><br><small style="color:#666;">{{ n.message[:50] }}...</small></td>
+      <td><span class="badge badge-blue">{{ n.target_branch | upper }}</span></td>
+      <td>{{ n.expires_at.strftime('%Y-%m-%d %H:%M') if n.expires_at else 'Never' }}</td>
+      <td>
+        {% if n.expires_at and n.expires_at < now %}
+        <span class="badge badge-orange">Expired</span>
+        {% else %}
+        <span class="badge badge-green">Active</span>
+        {% endif %}
+      </td>
+      <td><form action="{{ url_for('admin.admin_delete_notification', nid=n.id) }}" method="POST"><button type="submit" class="btn btn-danger btn-sm">Delete</button></form></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

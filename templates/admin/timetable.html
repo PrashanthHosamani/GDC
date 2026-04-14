@@ -1,0 +1,85 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Manage Timetable{% endblock %}
+{% block content %}
+<div class="card-header"><h2 class="card-title">Manage Timetable</h2></div>
+<div class="card">
+  <form action="{{ url_for('admin.admin_timetable') }}" method="POST">
+    <div style="display:flex;gap:15px;flex-wrap:wrap;">
+      <div class="form-group"><label>Branch</label>
+        <select name="branch" class="form-control" required>
+          <option value="bca">BCA</option><option value="bcom">BCOM</option><option value="bba">BBA</option><option value="puc">PUC</option><option value="mba">MBA</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Year</label><input type="number" name="year" class="form-control" min="1" max="5" required></div>
+      <div class="form-group"><label>Day</label>
+        <select name="day" class="form-control" required>
+          <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option>
+        </select>
+      </div>
+
+      <div class="form-group"><label>Start Time</label>
+        <select name="start_time" class="form-control" required>
+          <option value="08:00 AM">08:00 AM</option><option value="08:30 AM">08:30 AM</option>
+          <option value="09:00 AM">09:00 AM</option><option value="09:30 AM">09:30 AM</option>
+          <option value="10:00 AM">10:00 AM</option><option value="10:30 AM">10:30 AM</option>
+          <option value="11:00 AM">11:00 AM</option><option value="11:30 AM">11:30 AM</option>
+          <option value="12:00 PM">12:00 PM</option><option value="12:30 PM">12:30 PM</option>
+          <option value="01:00 PM">01:00 PM</option><option value="01:30 PM">01:30 PM</option>
+          <option value="02:00 PM">02:00 PM</option><option value="02:30 PM">02:30 PM</option>
+          <option value="03:00 PM">03:00 PM</option><option value="03:30 PM">03:30 PM</option>
+          <option value="04:00 PM">04:00 PM</option><option value="04:30 PM">04:30 PM</option>
+          <option value="05:00 PM">05:00 PM</option>
+        </select>
+      </div>
+      <div class="form-group"><label>End Time</label>
+        <select name="end_time" class="form-control" required>
+          <option value="08:30 AM">08:30 AM</option><option value="09:00 AM">09:00 AM</option>
+          <option value="09:30 AM">09:30 AM</option><option value="10:00 AM">10:00 AM</option>
+          <option value="10:30 AM">10:30 AM</option><option value="11:00 AM">11:00 AM</option>
+          <option value="11:30 AM">11:30 AM</option><option value="12:00 PM">12:00 PM</option>
+          <option value="12:30 PM">12:30 PM</option><option value="01:00 PM">01:00 PM</option>
+          <option value="01:30 PM">01:30 PM</option><option value="02:00 PM">02:00 PM</option>
+          <option value="02:30 PM">02:30 PM</option><option value="03:00 PM">03:00 PM</option>
+          <option value="03:30 PM">03:30 PM</option><option value="04:00 PM">04:00 PM</option>
+          <option value="04:30 PM">04:30 PM</option><option value="05:00 PM">05:00 PM</option>
+          <option value="05:30 PM">05:30 PM</option>
+        </select>
+      </div>
+      <!-- Hidden field to combine start+end into time_slot -->
+      <input type="hidden" name="time_slot" id="time_slot_hidden">
+
+      <div class="form-group"><label>Subject</label><input type="text" name="subject" class="form-control" required></div>
+      <div class="form-group"><label>Teacher</label><input type="text" name="teacher" class="form-control"></div>
+      <div class="form-group"><label>Room</label><input type="text" name="room" class="form-control"></div>
+      <div class="form-group" style="width:100%;"><button type="submit" class="btn btn-primary" onclick="combineTime(event)">Add Time Slot</button></div>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <tr><th>Branch & Year</th><th>Day</th><th>Time</th><th>Subject</th><th>Teacher (Room)</th><th>Actions</th></tr>
+    {% for t in timetables %}
+    <tr>
+      <td><span class="badge badge-blue">{{ t.branch | upper }}</span> Yr {{ t.year }}</td>
+      <td><strong>{{ t.day }}</strong></td>
+      <td><small>{{ t.time_slot }}</small></td>
+      <td>{{ t.subject }}</td>
+      <td>{{ t.teacher }} {% if t.room %}({{ t.room }}){% endif %}</td>
+      <td style="display:flex;gap:6px;">
+        <a href="{{ url_for('admin.admin_edit_timetable', tid=t.id) }}" class="btn btn-primary btn-sm">Edit</a>
+        <form action="{{ url_for('admin.admin_delete_timetable', tid=t.id) }}" method="POST"><button type="submit" class="btn btn-danger btn-sm">Delete</button></form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<script>
+function combineTime(e) {
+    var start = document.querySelector('select[name="start_time"]').value;
+    var end = document.querySelector('select[name="end_time"]').value;
+    document.getElementById('time_slot_hidden').value = start + ' - ' + end;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Admin Dashboard – GDC{% endblock %}
+{% block content %}
+<div class="card-header">
+  <h2 class="card-title">Dashboard Overview</h2>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ total_students }}</div>
+    <div class="stat-label">Total Students</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ active_notifications }}</div>
+    <div class="stat-label">Active Notifications</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ total_placements }}</div>
+    <div class="stat-label">Placement Drives</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Students by Branch</h2>
+  <div style="display:flex;gap:15px;margin-top:20px;flex-wrap:wrap;">
+    {% for branch, count in branch_counts.items() %}
+    <div style="background:#f9fafb;padding:15px 25px;border-radius:8px;border-left:4px solid var(--secondary);">
+      <div style="font-size:1.5rem;font-weight:700;color:var(--text-dark);">{{ count }}</div>
+      <div style="font-size:0.875rem;color:var(--text-light);font-weight:500;">{{ branch }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

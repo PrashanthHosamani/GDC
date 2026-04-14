@@ -1,0 +1,89 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Projects – GDC Admin{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:20px;color:#333;">🔧 Project Management</h2>
+
+<div class="card">
+  <h3>Assign Project to Student</h3>
+  <form method="POST" action="/admin/projects">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Student *</label>
+        <select name="student_id" required>
+          <option value="">Select Student</option>
+          {% for s in students %}
+          <option value="{{ s.id }}">{{ s.name }} ({{ s.reg_number }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Project Title *</label>
+        <input type="text" name="title" placeholder="e.g. Library Management System" required>
+      </div>
+      <div class="form-group">
+        <label>Subject</label>
+        <input type="text" name="subject" placeholder="e.g. DBMS Lab">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Guide / Mentor</label>
+        <input type="text" name="guide" placeholder="Prof. Name">
+      </div>
+      <div class="form-group">
+        <label>Semester *</label>
+        <input type="number" name="semester" placeholder="3" min="1" max="8" required>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+          <option value="ongoing">Ongoing</option>
+          <option value="submitted">Submitted</option>
+          <option value="evaluated">Evaluated</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea name="description" rows="3"
+                style="width:100%;padding:10px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:inherit;font-size:14px;"
+                placeholder="Project description, tech stack, objectives..."></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Assign Project</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>All Projects</h3>
+  {% if projects %}
+  <table>
+    <thead>
+      <tr><th>Student</th><th>Title</th><th>Subject</th><th>Guide</th><th>Sem</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      {% for project, student in projects %}
+      <tr>
+        <td><strong>{{ student.name }}</strong><br><span style="font-size:11px;color:#888;">{{ student.reg_number }}</span></td>
+        <td>{{ project.title }}</td>
+        <td>{{ project.subject or '-' }}</td>
+        <td>{{ project.guide or '-' }}</td>
+        <td>Sem {{ project.semester }}</td>
+        <td>
+          <span class="badge
+            {% if project.status == 'ongoing' %}badge-orange
+            {% elif project.status == 'submitted' %}badge-blue
+            {% else %}badge-green{% endif %}">
+            {{ project.status.title() }}
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:#999;text-align:center;padding:20px;">No projects assigned yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

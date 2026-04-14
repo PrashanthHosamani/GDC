@@ -1,0 +1,84 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Associations – GDC Admin{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:20px;color:#333;">🤝 Associations & Events</h2>
+
+<div class="card">
+  <h3>Add Association / Event</h3>
+  <form method="POST" action="/admin/associations">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Name *</label>
+        <input type="text" name="name" placeholder="e.g. NSS Camp 2024" required>
+      </div>
+      <div class="form-group">
+        <label>Category *</label>
+        <select name="category" required>
+          <option value="">Select</option>
+          <option value="NSS">NSS</option>
+          <option value="NCC">NCC</option>
+          <option value="Club">Club</option>
+          <option value="Sports">Sports</option>
+          <option value="Cultural">Cultural</option>
+          <option value="Academic">Academic</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Event Date</label>
+        <input type="date" name="event_date">
+      </div>
+      <div class="form-group">
+        <label>Contact</label>
+        <input type="text" name="contact" placeholder="email or phone">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea name="description" rows="3"
+                style="width:100%;padding:10px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:inherit;font-size:14px;"
+                placeholder="Describe the association or event..."></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>All Associations & Events</h3>
+  {% if associations %}
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Category</th><th>Date</th><th>Contact</th><th>Description</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+      {% for a in associations %}
+      <tr>
+        <td><strong>{{ a.name }}</strong></td>
+        <td>
+          <span class="badge
+            {% if a.category == 'NSS' %}badge-green
+            {% elif a.category == 'NCC' %}badge-blue
+            {% elif a.category == 'Sports' %}badge-orange
+            {% else %}badge-blue{% endif %}">
+            {{ a.category }}
+          </span>
+        </td>
+        <td>{{ a.event_date or '-' }}</td>
+        <td>{{ a.contact or '-' }}</td>
+        <td style="max-width:200px;font-size:13px;">{{ (a.description or '')[:60] }}{% if a.description and a.description|length > 60 %}...{% endif %}</td>
+        <td>
+          <form method="POST" action="/admin/associations/delete/{{ a.id }}"
+                onsubmit="return confirm('Delete?');" style="display:inline;">
+            <button class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:#999;text-align:center;padding:20px;">No associations added yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Ranks – GDC Admin{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:20px;color:#333;">🏆 Rank Management</h2>
+
+<div class="card">
+  <h3>Add Rank Entry</h3>
+  <form method="POST" action="/admin/ranks">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Student *</label>
+        <select name="student_id" required>
+          <option value="">Select Student</option>
+          {% for s in students %}
+          <option value="{{ s.id }}">{{ s.name }} ({{ s.reg_number }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Semester *</label>
+        <input type="number" name="semester" placeholder="1" min="1" max="8" required>
+      </div>
+      <div class="form-group">
+        <label>Rank *</label>
+        <input type="number" name="rank" placeholder="1" min="1" required>
+      </div>
+      <div class="form-group">
+        <label>SGPA *</label>
+        <input type="number" name="sgpa" placeholder="9.5" step="0.01" min="0" max="10" required>
+      </div>
+      <div class="form-group">
+        <label>Academic Year *</label>
+        <input type="number" name="year" placeholder="2024" required>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Rank</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>University Rank Holders</h3>
+  {% if ranks %}
+  <table>
+    <thead>
+      <tr><th>Student</th><th>Reg. No.</th><th>Semester</th><th>Rank</th><th>SGPA</th><th>Year</th></tr>
+    </thead>
+    <tbody>
+      {% for rank, student in ranks %}
+      <tr>
+        <td><strong>{{ student.name }}</strong></td>
+        <td>{{ student.reg_number }}</td>
+        <td>Sem {{ rank.semester }}</td>
+        <td>
+          {% if rank.rank == 1 %}<span class="badge badge-orange">🥇 Rank {{ rank.rank }}</span>
+          {% elif rank.rank == 2 %}<span class="badge badge-blue">🥈 Rank {{ rank.rank }}</span>
+          {% elif rank.rank == 3 %}<span class="badge badge-green">🥉 Rank {{ rank.rank }}</span>
+          {% else %}<span class="badge">Rank {{ rank.rank }}</span>{% endif %}
+        </td>
+        <td><strong>{{ rank.sgpa }}</strong></td>
+        <td>{{ rank.year }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:#999;text-align:center;padding:20px;">No rank entries yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

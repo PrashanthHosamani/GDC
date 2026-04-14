@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account – GDC</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;
+     align-items:center;justify-content:center;
+     background:linear-gradient(135deg,#0a1b2d,#1e3a8a);}
+.box{background:white;padding:40px;border-radius:16px;width:420px;max-width:95vw;
+     box-shadow:0 20px 50px rgba(0,0,0,0.3);}
+.box h2{font-size:22px;color:#222;margin-bottom:6px;}
+.box p{font-size:13px;color:#777;margin-bottom:22px;}
+.form-group{margin-bottom:15px;}
+.form-group label{display:block;font-size:13px;font-weight:600;color:#444;margin-bottom:5px;}
+.form-group input{width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;
+                  border-radius:9px;font-size:14px;outline:none;transition:.2s;}
+.form-group input:focus{border-color:#1e3a8a;box-shadow:0 0 0 3px rgba(30,58,138,.1);}
+.hint{font-size:12px;color:#999;margin-top:4px;}
+.btn{width:100%;padding:12px;background:linear-gradient(135deg,#1e3a8a,#2563eb);
+     color:white;border:none;border-radius:9px;font-size:15px;font-weight:600;
+     cursor:pointer;margin-top:4px;transition:.3s;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(30,58,138,.35);}
+.error-msg{background:#fef2f2;color:#b91c1c;padding:10px 14px;
+           border-radius:8px;font-size:13px;margin-bottom:15px;border-left:3px solid #ef4444;}
+.links{text-align:center;margin-top:18px;font-size:13px;color:#666;}
+.links a{color:#1e3a8a;font-weight:600;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>🎓 Create Your Account</h2>
+  <p>Enter your registration number to get started</p>
+
+  {% if error %}
+  <div class="error-msg">⚠️ {{ error }}</div>
+  {% endif %}
+
+  <form method="POST" action="/register">
+    <div class="form-group">
+      <label>Registration Number</label>
+      <input type="text" name="reg_number" placeholder="e.g. GDC2024BCA001" required>
+      <div class="hint">This must match the number given by the college admin.</div>
+    </div>
+    <div class="form-group">
+      <label>Choose Username</label>
+      <input type="text" name="username" placeholder="e.g. john_bca24" required>
+    </div>
+    <div class="form-group">
+      <label>Set Password</label>
+      <input type="password" name="password" placeholder="Minimum 6 characters" required minlength="6">
+    </div>
+    <button type="submit" class="btn">Create Account →</button>
+  </form>
+
+  <div class="links">
+    Already have an account? <a href="/login">Login here</a><br>
+    <a href="/" style="color:#999;font-weight:400;">← Back to Home</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{% extends "student/base_student.html" %}
+{% block title %}My Courses – GDC{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:20px;color:#333;">📚 My Courses</h2>
+<p style="color:#666;margin-bottom:20px;font-size:14px;">{{ student.branch.upper() }} – Year {{ student.year }}</p>
+
+{% if courses %}
+<div class="card">
+  <table>
+    <thead>
+      <tr><th>Course Code</th><th>Course Name</th><th>Credits</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      {% for c in courses %}
+      <tr>
+        <td><span class="badge badge-blue">{{ c.code or 'N/A' }}</span></td>
+        <td><strong>{{ c.name }}</strong></td>
+        <td>{{ c.credits or '-' }}</td>
+        <td style="font-size:13px;color:#666;">{{ c.description or '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div style="margin-top:14px;font-size:13px;color:#888;">
+    Total Courses: <strong>{{ courses|length }}</strong> |
+    Total Credits: <strong>{{ courses|sum(attribute='credits') }}</strong>
+  </div>
+</div>
+{% else %}
+<div class="card">
+  <p style="color:#999;text-align:center;padding:30px;">No courses found for your branch/year yet. Contact admin.</p>
+</div>
+{% endif %}
+
+{% endblock %}
