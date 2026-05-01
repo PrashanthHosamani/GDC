@@ -18,3 +18,4 @@ instance/
 
 # Docs generator (temporary)
 generate_docs.py
+.env

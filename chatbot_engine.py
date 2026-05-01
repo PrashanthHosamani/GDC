@@ -2,6 +2,9 @@ from openai import OpenAI
 from models import Fee, Placement, Course, Result, Association
 from seed import CHATBOT_RESPONSES
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 client = OpenAI(
   base_url="https://openrouter.ai/api/v1",
