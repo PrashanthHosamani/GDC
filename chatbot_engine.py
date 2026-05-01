@@ -1,10 +1,11 @@
 from openai import OpenAI
 from models import Fee, Placement, Course, Result, Association
 from seed import CHATBOT_RESPONSES
+import os
 
 client = OpenAI(
   base_url="https://openrouter.ai/api/v1",
-  api_key="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",
+  api_key=os.environ.get("OPENROUTER_API_KEY", "missing-key"),
 )
 
 def get_db_context_string(student=None):
