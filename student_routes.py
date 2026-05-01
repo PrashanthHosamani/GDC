@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, Response, stream_with_context
 from models import *
 from extensions import db
 from seed import CHATBOT_RESPONSES
@@ -38,13 +38,6 @@ def student_results():
         semesters.setdefault(r.semester, []).append(r)
     return render_template('student/results.html', student=student, semesters=semesters)
 
-@student_bp.route('/attendance')
-@student_required
-def student_attendance():
-    student = Student.query.get(session['user_id'])
-    attendance = Attendance.query.filter_by(student_id=student.id).all()
-    return render_template('student/attendance.html', student=student, attendance=attendance)
-
 @student_bp.route('/timetable')
 @student_required
 def student_timetable():
@@ -52,8 +45,14 @@ def student_timetable():
     days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
     timetable = {}
     for day in days:
+        # Try to get timetable for exact branch (merit-based)
         slots = Timetable.query.filter_by(branch=student.branch, year=student.year, day=day)\
                                .order_by(Timetable.time_slot).all()
+        # If not found and merit-based, try base branch
+        if not slots and '(m)' in student.branch:
+            base_branch = student.branch.replace('(m)', '')
+            slots = Timetable.query.filter_by(branch=base_branch, year=student.year, day=day)\
+                                   .order_by(Timetable.time_slot).all()
         timetable[day] = slots
     return render_template('student/timetable.html', student=student, timetable=timetable, days=days)
 
@@ -61,10 +60,31 @@ def student_timetable():
 @student_required
 def student_fees():
     student = Student.query.get(session['user_id'])
+    # Get fees for the exact branch only
     fees = Fee.query.filter_by(branch=student.branch, year=student.year).all()
+    
     student_fees = StudentFee.query.filter_by(student_id=student.id).all()
     paid_ids = {sf.fee_id for sf in student_fees if sf.paid}
     return render_template('student/fees.html', student=student, fees=fees, paid_ids=paid_ids)
+
+@student_bp.route('/fees/mark-paid/<int:fee_id>', methods=['POST'])
+@student_required
+def mark_fee_paid(fee_id):
+    student = Student.query.get(session['user_id'])
+    fee = Fee.query.get_or_404(fee_id)
+    
+    # Check if student fee record exists
+    student_fee = StudentFee.query.filter_by(student_id=student.id, fee_id=fee_id).first()
+    
+    if not student_fee:
+        student_fee = StudentFee(student_id=student.id, fee_id=fee_id)
+        db.session.add(student_fee)
+    
+    student_fee.paid = True
+    student_fee.paid_date = datetime.now().strftime('%Y-%m-%d')
+    db.session.commit()
+    flash('Fee marked as paid via office. Please verify with admin if needed.', 'success')
+    return redirect(url_for('student.student_fees'))
 
 @student_bp.route('/placements')
 @student_required
@@ -82,26 +102,7 @@ def student_placements():
     return render_template('student/placements.html', student=student,
                            eligible=eligible, not_eligible=not_eligible)
 
-@student_bp.route('/projects')
-@student_required
-def student_projects():
-    student = Student.query.get(session['user_id'])
-    projects = Project.query.filter_by(student_id=student.id).all()
-    return render_template('student/projects.html', student=student, projects=projects)
 
-@student_bp.route('/ranks')
-@student_required
-def student_ranks():
-    student = Student.query.get(session['user_id'])
-    ranks = Rank.query.filter_by(student_id=student.id).order_by(Rank.semester).all()
-    return render_template('student/ranks.html', student=student, ranks=ranks)
-
-@student_bp.route('/courses')
-@student_required
-def student_courses():
-    student = Student.query.get(session['user_id'])
-    courses = Course.query.filter_by(branch=student.branch, year=student.year).all()
-    return render_template('student/courses.html', student=student, courses=courses)
 
 @student_bp.route('/notifications')
 @student_required
@@ -117,17 +118,17 @@ def student_associations():
     student = Student.query.get(session['user_id'])
     return render_template('student/associations.html', student=student, associations=associations)
 
-@student_bp.route('/chatbot', methods=['GET', 'POST'])
+
+@student_bp.route('/chatbot/api', methods=['POST'])
 @student_required
-def student_chatbot():
-    reply = ""
-    query = ""
-    if request.method == 'POST':
-        query = request.form.get('message', '')
-        text = query.lower()
-        reply = "Sorry, I didn't understand that. Try asking about admission, fees, courses, placements, or type 'help'."
-        for key, response in CHATBOT_RESPONSES.items():
-            if key in text:
-                reply = response
-                break
-    return render_template('student/chatbot.html', query=query, reply=reply)
+def student_chatbot_api():
+    data = request.json if request.is_json else request.form
+    query = data.get('message', '')
+    history = data.get('history', [])
+    student = Student.query.get(session['user_id'])
+    from chatbot_engine import get_chatbot_response
+    
+    resp = Response(stream_with_context(get_chatbot_response(query, student, history)), mimetype='text/event-stream')
+    resp.headers['X-Accel-Buffering'] = 'no'
+    resp.headers['Cache-Control'] = 'no-cache'
+    return resp

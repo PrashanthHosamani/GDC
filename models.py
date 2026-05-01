@@ -11,7 +11,7 @@ class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     reg_number = db.Column(db.String(30), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
-    branch = db.Column(db.String(20))   # bca, bcom, bba, puc, mba
+    branch = db.Column(db.String(20))   # bca, bcom, bba, puc, mba, bca(m), bcom(m), bba(m), mba(m)
     year = db.Column(db.Integer)
     email = db.Column(db.String(100))
     phone = db.Column(db.String(15))
@@ -28,11 +28,11 @@ class Notification(db.Model):
     message = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime)
-    target_branch = db.Column(db.String(20), default='all')  # all / bca / bcom etc
+    target_branch = db.Column(db.String(20), default='all')  # all / bca / bcom / bca(m) / bcom(m) etc
 
 class Fee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    branch = db.Column(db.String(20), nullable=False)
+    branch = db.Column(db.String(20), nullable=False)  # Supports: bca, bcom, bba, puc, mba, bca(m), bcom(m), bba(m), mba(m)
     year = db.Column(db.Integer, nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(200))
@@ -79,14 +79,6 @@ class Result(db.Model):
     grade = db.Column(db.String(5))
     year = db.Column(db.Integer)
 
-class Attendance(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    subject = db.Column(db.String(100))
-    total_classes = db.Column(db.Integer, default=0)
-    attended = db.Column(db.Integer, default=0)
-    semester = db.Column(db.Integer)
-
 class Timetable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     branch = db.Column(db.String(20), nullable=False)
@@ -97,14 +89,6 @@ class Timetable(db.Model):
     teacher = db.Column(db.String(100))
     room = db.Column(db.String(20))
 
-class Rank(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    semester = db.Column(db.Integer)
-    rank = db.Column(db.Integer)
-    sgpa = db.Column(db.Float)
-    year = db.Column(db.Integer)
-
 class Association(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -112,16 +96,3 @@ class Association(db.Model):
     event_date = db.Column(db.String(30))
     category = db.Column(db.String(50))  # NSS, NCC, Club, Sports
     contact = db.Column(db.String(100))
-
-class Project(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.id'))
-    title = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text)
-    subject = db.Column(db.String(100))
-    guide = db.Column(db.String(100))
-    status = db.Column(db.String(30), default='ongoing')  # ongoing / submitted / evaluated
-    marks = db.Column(db.Float)
-    semester = db.Column(db.Integer)
-
-# ─────────────────────────────────────────

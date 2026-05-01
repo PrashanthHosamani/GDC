@@ -157,6 +157,7 @@ body {
 
 <script>
 var chatOpen = false;
+var chatHistory = [];
 
 function toggleChat() {
     chatOpen = !chatOpen;
@@ -164,31 +165,6 @@ function toggleChat() {
     win.style.display = chatOpen ? 'flex' : 'none';
     if (chatOpen) document.getElementById('chatInput').focus();
 }
-
-var responses = {
-    "admission": "Admissions open in May. Courses: BCA, BBA, BCom, PUC, MBA. Visit the college office or call for details.",
-    "fees": "Fees vary: BCA ~₹45,000/yr, BBA ~₹40,000/yr, BCom ~₹35,000/yr, MBA ~₹80,000/yr. Check with admin for exact details.",
-    "placement": "GDC has excellent placement support. Top IT & management companies visit campus. Average package: ₹3-5 LPA.",
-    "exam": "Exam timetables are posted on the notice board and the student portal. Check Notifications for updates.",
-    "sports": "Sports Day is held every January. GDC participates in university-level tournaments.",
-    "calendar": "Holidays: Dasara, Christmas, Eid, and a 2-month Summer vacation. Check the college website for full calendar.",
-    "nss": "NSS (National Service Scheme) is active at GDC. Enroll at the start of the academic year.",
-    "ncc": "NCC (National Cadet Corps) is available. Contact the NCC officer for enrollment.",
-    "bca": "BCA is a 3-year program focused on software, programming, and IT skills.",
-    "bcom": "BCom covers accounting, finance, and business administration over 3 years.",
-    "bba": "BBA is a management-focused 3-year undergraduate program.",
-    "mba": "MBA is a 2-year postgraduate management program.",
-    "puc": "PUC is a 2-year program. GDC offers Science and Commerce streams.",
-    "library": "The GDC library is open 9 AM – 5 PM on weekdays. Large collection of books & digital resources.",
-    "hostel": "Hostel available for outstation students. Contact the admin office for room availability.",
-    "scholarship": "Scholarships available for merit and SC/ST/OBC students. Check with the admin office for eligibility.",
-    "contact": "GDC Contact: Surathkal-575014, D.K. Phone: 0824-XXXXXXX. Email: info@gdc.edu.in",
-    "result": "Results are published on the Mangalore University website and the student portal.",
-    "attendance": "Minimum 75% attendance required to appear for exams.",
-    "hello": "Hello! 👋 How can I help you today? Ask me anything about GDC!",
-    "hi": "Hi there! 👋 Ask me about admissions, courses, fees, placements and more!",
-    "help": "You can ask me about: Admission, Fees, Courses (BCA/BBA/BCom/MBA/PUC), Placements, Exams, Sports, NSS/NCC, Library, Hostel, Scholarships, Results, Attendance, Contact."
-};
 
 function sendMsg() {
     var input = document.getElementById('chatInput');
@@ -198,20 +174,68 @@ function sendMsg() {
     addMsg(text, 'user');
     input.value = '';
 
-    var reply = "Sorry, I didn't understand that. Try asking about admission, fees, courses, or type 'help'.";
-    var lower = text.toLowerCase();
-    for (var key in responses) {
-        if (lower.indexOf(key) !== -1) { reply = responses[key]; break; }
-    }
+    // Create an empty bot message box
+    var box = document.getElementById('chatMessages');
+    var botDiv = document.createElement('div');
+    botDiv.className = 'msg bot';
+    botDiv.innerHTML = '<span class="typing-indicator dots">...</span>';
+    box.appendChild(botDiv);
+    box.scrollTop = box.scrollHeight;
 
-    setTimeout(function() { addMsg(reply, 'bot'); }, 400);
+    var requestPayload = {
+        message: text,
+        history: chatHistory
+    };
+    chatHistory.push({role: 'user', content: text});
+
+    fetch('/chatbot/api', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestPayload)
+    })
+    .then(async response => {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let fullReply = "";
+        let isFirstChunk = true;
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = decoder.decode(value, {stream: true});
+            const lines = chunk.split('\n');
+            
+            for (let line of lines) {
+                if (line.startsWith('data: ')) {
+                    const dataText = line.substring(6);
+                    if (dataText === '[DONE]') continue;
+                    
+                    if (isFirstChunk) {
+                        botDiv.innerHTML = '';
+                        isFirstChunk = false;
+                    }
+                    
+                    fullReply += dataText;
+                    botDiv.innerHTML = fullReply.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                    box.scrollTop = box.scrollHeight;
+                }
+            }
+        }
+        chatHistory.push({role: 'assistant', content: fullReply});
+    })
+    .catch(err => {
+        botDiv.innerHTML = "Sorry, an error occurred while connecting to the server.";
+    });
 }
 
 function addMsg(text, type) {
     var box = document.getElementById('chatMessages');
     var div = document.createElement('div');
     div.className = 'msg ' + type;
-    div.textContent = text;
+    div.innerHTML = text; // since we use <br> and bold formatting
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
 }

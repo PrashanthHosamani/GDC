@@ -36,9 +36,10 @@ def seed_data():
         a2 = Admin(username='admin2', password=generate_password_hash('admin456', method='pbkdf2:sha256'), name='Vice Principal')
         db.session.add_all([a1, a2])
 
-    # Sample fees for all branches
+    # Sample fees for all branches (regular + merit-based)
     if not Fee.query.first():
         fees_data = [
+            # Regular Branches
             ('bca', 1, 45000, 'BCA Year 1 Tuition + Exam Fee', '2024-11-30'),
             ('bca', 2, 42000, 'BCA Year 2 Tuition + Exam Fee', '2025-11-30'),
             ('bca', 3, 42000, 'BCA Year 3 Tuition + Exam Fee', '2026-11-30'),
@@ -47,6 +48,14 @@ def seed_data():
             ('bba', 1, 40000, 'BBA Year 1 Tuition', '2024-11-30'),
             ('mba', 1, 80000, 'MBA Year 1 Tuition', '2024-11-30'),
             ('puc', 1, 25000, 'PUC Year 1 Tuition', '2024-11-30'),
+            # Merit-Based Branches (slightly lower fees)
+            ('bca(m)', 1, 40000, 'BCA(Merit) Year 1 Tuition + Exam Fee', '2024-11-30'),
+            ('bca(m)', 2, 38000, 'BCA(Merit) Year 2 Tuition + Exam Fee', '2025-11-30'),
+            ('bca(m)', 3, 38000, 'BCA(Merit) Year 3 Tuition + Exam Fee', '2026-11-30'),
+            ('bcom(m)', 1, 32000, 'BCom(Merit) Year 1 Tuition', '2024-11-30'),
+            ('bcom(m)', 2, 30000, 'BCom(Merit) Year 2 Tuition', '2025-11-30'),
+            ('bba(m)', 1, 36000, 'BBA(Merit) Year 1 Tuition', '2024-11-30'),
+            ('mba(m)', 1, 75000, 'MBA(Merit) Year 1 Tuition', '2024-11-30'),
         ]
         for b, y, amt, desc, due in fees_data:
             db.session.add(Fee(branch=b, year=y, amount=amt, description=desc, due_date=due))

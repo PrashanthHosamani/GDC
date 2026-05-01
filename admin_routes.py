@@ -29,7 +29,7 @@ def admin_dashboard():
     total_placements = Placement.query.count()
     active_notifications = len(get_active_notifications())
     branch_counts = {}
-    for b in ['bca','bcom','bba','puc','mba']:
+    for b in ['bca','bcom','bba','puc','mba','bca(m)','bcom(m)','bba(m)','mba(m)']:
         branch_counts[b.upper()] = Student.query.filter_by(branch=b).count()
     return render_template('admin/dashboard.html',
                            total_students=total_students,
@@ -142,15 +142,6 @@ def admin_delete_placement(pid):
     db.session.delete(Placement.query.get_or_404(pid)); db.session.commit()
     return redirect(url_for('admin.admin_placements'))
 
-@admin_bp.route('/ranks', methods=['GET', 'POST'])
-@admin_required
-def admin_ranks():
-    if request.method == 'POST':
-        db.session.add(Rank(student_id=int(request.form.get('student_id')), semester=int(request.form.get('semester')), rank=int(request.form.get('rank')), sgpa=float(request.form.get('sgpa')), year=int(request.form.get('year'))))
-        db.session.commit()
-        return redirect(url_for('admin.admin_ranks'))
-    return render_template('admin/ranks.html', ranks=db.session.query(Rank, Student).join(Student).order_by(Rank.semester, Rank.rank).all(), students=Student.query.order_by(Student.name).all())
-
 @admin_bp.route('/associations', methods=['GET', 'POST'])
 @admin_required
 def admin_associations():
@@ -174,15 +165,6 @@ def admin_results():
         db.session.commit()
         return redirect(url_for('admin.admin_results'))
     return render_template('admin/results.html', students=Student.query.order_by(Student.name).all())
-
-@admin_bp.route('/attendance', methods=['GET', 'POST'])
-@admin_required
-def admin_attendance():
-    if request.method == 'POST':
-        db.session.add(Attendance(student_id=int(request.form.get('student_id')), subject=request.form.get('subject'), total_classes=int(request.form.get('total_classes')), attended=int(request.form.get('attended')), semester=int(request.form.get('semester'))))
-        db.session.commit()
-        return redirect(url_for('admin.admin_attendance'))
-    return render_template('admin/attendance.html', students=Student.query.order_by(Student.name).all())
 
 @admin_bp.route('/timetable', methods=['GET', 'POST'])
 @admin_required
@@ -217,11 +199,4 @@ def admin_edit_timetable(tid):
     return render_template('admin/edit_timetable.html', t=t)
 
 
-@admin_bp.route('/projects', methods=['GET', 'POST'])
-@admin_required
-def admin_projects():
-    if request.method == 'POST':
-        db.session.add(Project(student_id=int(request.form.get('student_id')), title=request.form.get('title'), description=request.form.get('description'), subject=request.form.get('subject'), guide=request.form.get('guide'), status=request.form.get('status','ongoing'), semester=int(request.form.get('semester'))))
-        db.session.commit()
-        return redirect(url_for('admin.admin_projects'))
-    return render_template('admin/projects.html', projects=db.session.query(Project, Student).join(Student).order_by(Project.semester).all(), students=Student.query.order_by(Student.name).all())
+

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, stream_with_context
 from extensions import db
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import Admin, Student
@@ -18,6 +18,34 @@ db.init_app(app)
 
 app.register_blueprint(admin_bp)
 app.register_blueprint(student_bp)
+
+@app.route('/debug-db')
+def debug_db():
+    from models import Student, Admin
+
+    students = Student.query.all()
+    admins = Admin.query.all()
+
+    student_data = [
+        {
+            "id": s.id,
+            "name": s.name,
+            "username": s.username,
+            "branch": s.branch
+        } for s in students
+    ]
+
+    admin_data = [
+        {
+            "id": a.id,
+            "username": a.username
+        } for a in admins
+    ]
+
+    return {
+        "students": student_data,
+        "admins": admin_data
+    }
 
 @app.route('/')
 def index():
@@ -80,6 +108,18 @@ def register():
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+@app.route('/chatbot/api', methods=['POST'])
+def public_chatbot_api():
+    data = request.json if request.is_json else request.form
+    query = data.get('message', '')
+    history = data.get('history', [])
+    from chatbot_engine import get_chatbot_response
+    
+    resp = Response(stream_with_context(get_chatbot_response(query, None, history)), mimetype='text/event-stream')
+    resp.headers['X-Accel-Buffering'] = 'no'
+    resp.headers['Cache-Control'] = 'no-cache'
+    return resp
 
 if __name__ == '__main__':
     with app.app_context():
