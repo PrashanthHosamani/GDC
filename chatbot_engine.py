@@ -4,7 +4,7 @@ from seed import CHATBOT_RESPONSES
 
 client = OpenAI(
   base_url="https://openrouter.ai/api/v1",
-  api_key="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",
+  api_key="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",
 )
 
 def get_db_context_string(student=None):
